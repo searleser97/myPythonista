@@ -101,12 +101,14 @@ class TransferRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(html.encode())
             return
-        file_path = urllib.parse.unquote(path)[1:]
+        file_name = urllib.parse.unquote(path)[1:]
+        file_path = root_dir = os.path.expanduser('~/Documents/' + FOLDER_TO_SERVE + '/' + file_name)
+        print(file_path)
         if os.path.isfile(file_path):
             self.send_response(200)
             self.send_header('Content-Type', 'application/x-python')
             self.send_header('Content-Disposition',
-                             'attachment; filename=%s' % file_path)
+                             'attachment; filename=%s' % file_name)
             self.end_headers()
             with open(file_path, 'r') as f:
                 data = f.read()
@@ -119,7 +121,7 @@ class TransferRequestHandler(BaseHTTPRequestHandler):
             self.send_response(404)
             self.send_header('Content-Type', 'text/html')
             self.end_headers()
-            self.wfile.write(html)
+            self.wfile.write(html.encode())
 
     def do_POST(self):
         form = cgi.FieldStorage(fp=self.rfile, headers=self.headers,
